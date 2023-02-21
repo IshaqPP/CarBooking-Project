@@ -1,12 +1,12 @@
 import React from 'react';
 import AdminHeader from "../Header/Admin_Header";
-import car from "../Pages/Car";
+import CarRegister from "../Pages/Car";
 
 const Admin_Home = () => {
     return (
         <div>
             <AdminHeader />
-            <car />
+            <CarRegister />
         </div >
     )
 }

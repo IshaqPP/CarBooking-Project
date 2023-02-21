@@ -6,29 +6,44 @@ import {
     MDBCol,
 } from 'mdb-react-ui-kit';
 import React, { useState, useEffect } from "react";
+import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const CarDetails = () => {
     const [formData, setFormData] = useState({
-        name: "",
-        dob: "",
-        studenClass: "",
-        division: "",
-        gender: ""
+        Location: "",
+        Date: ""
     });
-    const [loading, setLoading] = useState(false);
 
-    const [Students, SETstudent] = useState([
-        { id: "", name: "", dob: "", cls: "", div: "", gender: "" }
-    ])
-
-    const handleClear = () => {
-        setFormData("");
-    };
-
-    const { name, dob, studenClass, division, gender } = formData;
 
     const onChange = e =>
         setFormData({ ...formData, [e.target.name]: e.target.value });
+
+    const [Location, SetLocation] = useState([]);
+
+    useEffect(() => {
+        axios.get('http://localhost:5000/Location')
+            .then(response => {
+                SetLocation(response.data);
+                console.log(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }, []);
+
+    const [carData, SetcarData] = useState([]);
+
+    useEffect(() => {
+        axios.get('http://localhost:5000/Admin/CarData')
+            .then(response => {
+                SetcarData(response.data);
+                console.log(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    });
 
     return (
         <div>
@@ -39,16 +54,16 @@ const CarDetails = () => {
                     <MDBCol >
                         <div className='d-md-flex ustify-content-start align-items-center mt-2 mb-4'>
                             <h6 className="font-weight-bold  " style={{ fontSize: '20px', marginRight: "35px" }}>Location   </h6>
-                            <select defaultValue={"A"} name="division" value={division} onChange={onChange}>
-                                <option value="A">A</option>
-                                <option value="B">B</option>
-                                <option value="C">C</option>
+                            <select name="Location" value={Location} onChange={onChange}>
+                                {Location.map(item => (
+                                    <option key={item.id} value={item.name}>{item.name}</option>
+                                ))}
                             </select>
                         </div>
                     </MDBCol >
                     <MDBCol >
-                        <MDBInput wrapperClass='mb-4' size='lg' id='form3' type='date' name="dob"
-                            value={dob}
+                        <MDBInput wrapperClass='mb-4' size='lg' id='form3' type='date' name="Date"
+                            value={Date}
                             onChange={onChange}
                             required />
                     </MDBCol >
@@ -59,16 +74,21 @@ const CarDetails = () => {
                 </MDBRow>
             </div>
             <div>
-                <Card style={{ width: '18rem' }}>
-                    <Card.Body>
-                        <Card.Title>Card Title</Card.Title>
-                        <Card.Text>
-                            Some quick example text to build on the card title and make up the
-                            bulk of the card's content.
-                        </Card.Text>
-                        <Button variant="primary">Go somewhere</Button>
-                    </Card.Body>
-                </Card>
+                {carData.map(item => (
+                    <Card style={{ width: '18rem' }} key={item.id}>
+                        <Card.Body>
+                            <Card.Title><label>Name &emsp;&nbsp; &nbsp;: &nbsp;</label><b>{item.name} </b></Card.Title>
+                            <Card.Text>
+                                <label>Brand &emsp;&emsp;&nbsp; &nbsp;: &nbsp;</label> <b>{item.Brand}</b>
+                            </Card.Text>
+                            <Card.Text>
+                                <label>Segment &emsp;&nbsp;  :&nbsp;</label> <b>{item.Segment}</b>
+                            </Card.Text>
+                            <Button variant="primary" style={{ marginLeft: "31%" }} onClick={() => <Link to='/Carbook'></Link>}>Book</Button>
+
+                        </Card.Body>
+                    </Card>
+                ))}
             </div>
         </div>
 

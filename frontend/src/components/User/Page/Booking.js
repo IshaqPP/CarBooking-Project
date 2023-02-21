@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
+import UserHeader from '../Header/User_Header'
+
 import {
     MDBBtn,
     MDBContainer,
@@ -16,34 +18,42 @@ import {
 
 const Booking = () => {
 
-    const [formData, setFormData] = useState({
-        name: "",
-        Date: "",
-        Location: ""
-    });
+    const [formData, setFormData] = useState({});
 
+    const [Location, SetLocation] = useState([]);
 
-    const handleClear = () => {
-        setFormData("");
+    useEffect(() => {
+        axios.get('http://localhost:5000/Location')
+            .then(response => {
+                SetLocation(response.data);
+                console.log(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }, []);
+
+    const handleInputChange = (event) => {
+        const { name, value } = event.target;
+        setFormData({ ...formData, [name]: value });
     };
 
-    const { name, Date, Location } = formData;
-
-
-    const onChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
-    const onSubmit = e => {
-        e.preventDefault();
-        axios.post('http://localhost:8080/student', formData)
-            .then(data => {
-                handleClear();
-                window.alert("successfully added")
-
-                // console.log(data);
-            })
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        console.log("^^^^^");
         console.log(formData);
+
+        axios.post('http://localhost:5000/Booking', formData)
+            .then(response => {
+                window.alert("Car Successfully Booked")
+            })
+            .catch(error => {
+                console.error(error);
+            });
     };
     return (
         <div style={{ minHeight: "100%" }}>
+            <UserHeader />
             <MDBContainer fluid className='bg-dark ' >
                 < MDBRow className='d-flex justify-content-center ' style={{ paddingTop: "50px", paddingBottom: "145px" }}>
                     <MDBCol>
@@ -52,25 +62,23 @@ const Booking = () => {
                                 <MDBCol md='12' className="d-none d-md-block">
                                     <MDBCardBody className='text-black d-flex flex-column justify-content-center'>
                                         <h3 className="mb-4 text-uppercase text-center font-weight-bold"> Booking Form </h3>
-                                        <form onSubmit={onSubmit}>
+                                        <form onSubmit={handleSubmit}>
                                             <MDBRow>
                                                 <MDBCol md='12'>
                                                     <MDBInput wrapperClass='mb-4' size='lg' id='form1' type='text' name="name" placeholder="Name "
-                                                        value={name}
-                                                        onChange={onChange}
+                                                        onChange={handleInputChange}
                                                         required />
                                                 </MDBCol>
                                             </MDBRow>
-                                            <MDBInput wrapperClass='mb-4' size='lg' id='form3' type='date' name="dob"
-                                                value={Date}
-                                                onChange={onChange}
+                                            <MDBInput wrapperClass='mb-4' size='lg' id='form3' type='date' name="Date"
+                                                onChange={handleInputChange}
                                                 required />
                                             <div className='d-md-flex ustify-content-start align-items-center mt-2 mb-4'>
                                                 <h6 className="font-weight-bold  " style={{ fontSize: '20px', marginRight: "35px" }}>Location   </h6>
-                                                <select defaultValue={"A"} name="division" value={Location} onChange={onChange}>
-                                                    <option value="A">A</option>
-                                                    <option value="B">B</option>
-                                                    <option value="C">C</option>
+                                                <select name="Location" onChange={handleInputChange}>
+                                                    {Location.map(item => (
+                                                        <option key={item.id} value={item.name}>{item.name}</option>
+                                                    ))}
                                                 </select>
                                             </div>
 
